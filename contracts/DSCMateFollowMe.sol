@@ -21,13 +21,14 @@ contract DSCMateFollowMe is IDSCMateFollowMe {
     function set(address mates, uint256 mateId, uint256 index, string calldata link) onlyHolder(mates, mateId) external {
         FollowMe storage fm = followMes[mates][mateId];
         if (fm.owner != msg.sender) {
-            delete fm.links;
+            fm.links = new string[](10);
         }
         fm.links[index] = link;
         fm.owner = msg.sender;
+        emit Set(mates, mateId, msg.sender, index, link);
     }
 
-    function followMe(address mates, uint256 mateId, uint256 index) external returns (string memory link) {
+    function followMe(address mates, uint256 mateId, uint256 index) view external returns (string memory link) {
         FollowMe memory fm = followMes[mates][mateId];
         if (IKIP17Enumerable(mates).ownerOf(mateId) == fm.owner) {
             link = fm.links[index];
